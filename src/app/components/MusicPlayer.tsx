@@ -38,12 +38,27 @@ function TrackArtwork({ trackId, className, style }: { trackId?: string; classNa
   return <img src={url} alt="" className={className} style={style} />;
 }
 
-export function MusicPlayer() {
+interface MusicPlayerProps {
+  onClose?: () => void;
+}
+
+export function MusicPlayer({ onClose }: MusicPlayerProps) {
   const player = usePlayer();
   const [view, setView] = useState<View>("home");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Track[]>([]);
   const [allTracks, setAllTracks] = useState<Track[]>([]);
+
+  useEffect(() => {
+    if (!onClose) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
   const [favorites, setFavorites] = useState<Track[]>([]);
   const [recent, setRecent] = useState<Track[]>([]);
   const [mostPlayed, setMostPlayed] = useState<Track[]>([]);
@@ -226,11 +241,18 @@ export function MusicPlayer() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar */}
         <aside className="flex flex-col w-56 shrink-0 overflow-y-auto" style={{ background: "#111111" }}>
-          <div className="flex items-center gap-2 px-5 py-5">
-            <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "#1db954" }}>
-              <Disc3 size={14} color="#000" />
+          <div className="flex items-center justify-between gap-2 px-5 py-5">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "#1db954" }}>
+                <Disc3 size={14} color="#000" />
+              </div>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>MYLO Music</span>
             </div>
-            <span style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>MYLO Music</span>
+            {onClose && (
+              <button onClick={onClose} className="p-2 rounded-full transition-colors hover:bg-white/10" style={{ color: "#aaa" }} aria-label="Close player">
+                <X size={16} />
+              </button>
+            )}
           </div>
 
           <nav className="px-3 space-y-0.5">
