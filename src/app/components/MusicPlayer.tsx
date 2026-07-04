@@ -1,9 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import {
-  Home, Search, ListMusic, Heart, Plus, Play, Pause,
-  Shuffle, SkipBack, SkipForward, Repeat, Repeat1, Volume2, VolumeX,
-  MoreHorizontal, FolderOpen, Music, Disc3, Mic2, Clock, TrendingUp,
-  X, FolderPlus, Loader2
+  Play, Pause, Heart, Plus, MoreHorizontal, FolderOpen, Music,
+  FolderPlus, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "./ui/sonner";
@@ -22,43 +20,20 @@ import {
   isFileSystemAccessSupported, pickFolder, getStoredFolders, requestPermission,
 } from "../db/fileSystemManager";
 import { usePlayer, restoreQueueFromLastSession } from "../hooks/usePlayer";
-import { useArtwork } from "../hooks/useArtwork";
+import { formatTime } from "../utils/format";
+import type { View } from "../types/view";
+import { TrackArtwork } from "./shared/TrackArtwork";
+import { Sidebar } from "./shell/Sidebar";
+import { TopBar } from "./shell/TopBar";
+import { TransportBar } from "./shell/TransportBar";
+import { QueuePanel } from "./shell/QueuePanel";
 
-function formatTime(secs: number) {
-  if (!isFinite(secs) || secs < 0) secs = 0;
-  const m = Math.floor(secs / 60);
-  const s = Math.floor(secs % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
-type View = "home" | "songs" | "albums" | "artists" | "genres" | "folders" | "playlists" | "favorites" | "recent" | "most-played" | "search";
-
-function TrackArtwork({ trackId, className, style }: { trackId?: string; className?: string; style?: React.CSSProperties }) {
-  const url = useArtwork(trackId);
-  return <img src={url} alt="" className={className} style={style} />;
-}
-
-interface MusicPlayerProps {
-  onClose?: () => void;
-}
-
-export function MusicPlayer({ onClose }: MusicPlayerProps) {
+export function MusicPlayer() {
   const player = usePlayer();
   const [view, setView] = useState<View>("home");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Track[]>([]);
   const [allTracks, setAllTracks] = useState<Track[]>([]);
-
-  useEffect(() => {
-    if (!onClose) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
   const [favorites, setFavorites] = useState<Track[]>([]);
   const [recent, setRecent] = useState<Track[]>([]);
   const [mostPlayed, setMostPlayed] = useState<Track[]>([]);
@@ -203,9 +178,6 @@ export function MusicPlayer({ onClose }: MusicPlayerProps) {
     player.seek(ratio * player.duration);
   }, [player]);
 
-  const progressPct = player.duration > 0 ? (player.position / player.duration) * 100 : 0;
-  const volumePct = player.muted ? 0 : player.volume * 100;
-
   const currentList = useMemo(() => {
     if (view === "search") return searchResults;
     if (view === "favorites") return favorites;
@@ -213,8 +185,6 @@ export function MusicPlayer({ onClose }: MusicPlayerProps) {
     if (view === "most-played") return mostPlayed;
     return allTracks;
   }, [view, searchResults, favorites, recent, mostPlayed, allTracks]);
-
-  const repeatIcon = player.repeat === "one" ? <Repeat1 size={15} /> : <Repeat size={15} />;
 
   return (
     <div className="flex flex-col h-screen" style={{ background: "#0d0d0d", color: "#fff", fontFamily: "Inter, system-ui, sans-serif" }}>
@@ -239,118 +209,25 @@ export function MusicPlayer({ onClose }: MusicPlayerProps) {
       />
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar */}
-        <aside className="flex flex-col w-56 shrink-0 overflow-y-auto" style={{ background: "#111111" }}>
-          <div className="flex items-center justify-between gap-2 px-5 py-5">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "#1db954" }}>
-                <Disc3 size={14} color="#000" />
-              </div>
-              <span style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>MYLO Music</span>
-            </div>
-            {onClose && (
-              <button onClick={onClose} className="p-2 rounded-full transition-colors hover:bg-white/10" style={{ color: "#aaa" }} aria-label="Close player">
-                <X size={16} />
-              </button>
-            )}
-          </div>
-
-          <nav className="px-3 space-y-0.5">
-            {[
-              { id: "home" as View, label: "Home", icon: Home },
-              { id: "songs" as View, label: "Songs", icon: Music },
-              { id: "albums" as View, label: "Albums", icon: Disc3 },
-              { id: "artists" as View, label: "Artists", icon: Mic2 },
-              { id: "genres" as View, label: "Genres", icon: ListMusic },
-              { id: "folders" as View, label: "Folders", icon: FolderOpen },
-              { id: "favorites" as View, label: "Favorites", icon: Heart },
-              { id: "recent" as View, label: "Recently Played", icon: Clock },
-              { id: "most-played" as View, label: "Most Played", icon: TrendingUp },
-            ].map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                onClick={() => setView(id)}
-                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg transition-colors"
-                style={{
-                  background: view === id ? "rgba(255,255,255,0.08)" : "transparent",
-                  color: view === id ? "#fff" : "#a0a0a0",
-                  fontSize: "13px",
-                }}
-              >
-                <Icon size={16} />
-                {label}
-              </button>
-            ))}
-          </nav>
-
-          <div className="mt-5 px-3">
-            <div className="flex items-center justify-between px-3 mb-2">
-              <span style={{ fontSize: "11px", fontWeight: 600, color: "#6b6b6b", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                Playlists
-              </span>
-            </div>
-            <div className="space-y-0.5">
-              {playlists.map(pl => (
-                <button
-                  key={pl.id}
-                  onClick={() => setView("playlists")}
-                  className="flex items-center gap-2.5 w-full px-2 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
-                >
-                  <div className="w-8 h-8 rounded-md bg-violet-600 shrink-0 flex items-center justify-center">
-                    <ListMusic size={14} color="#fff" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="truncate" style={{ fontSize: "12px", color: "#ddd" }}>{pl.name}</div>
-                    <div style={{ fontSize: "10px", color: "#666" }}>{pl.trackIds.length} songs</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-auto px-4 pb-4 space-y-2">
-            <button
-              onClick={async () => {
-                const name = prompt("Playlist name");
-                if (name) { await createPlaylist(name); setPlaylists(await getPlaylists()); }
-              }}
-              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg border transition-colors hover:bg-white/5"
-              style={{ borderColor: "rgba(255,255,255,0.12)", fontSize: "12px", color: "#aaa" }}
-            >
-              <Plus size={14} />
-              New playlist
-            </button>
-            <button
-              onClick={handleAddFolder}
-              disabled={!!scanning}
-              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg transition-colors hover:opacity-90"
-              style={{ background: "#1db954", fontSize: "12px", color: "#000", fontWeight: 500 }}
-            >
-              {scanning ? <Loader2 size={14} className="animate-spin" /> : <FolderPlus size={14} />}
-              {scanning ? `Scanning… ${scanning.scanned}` : "Add Music Folder"}
-            </button>
-          </div>
-        </aside>
+        <Sidebar
+          view={view}
+          onViewChange={setView}
+          playlists={playlists}
+          onCreatePlaylist={async () => {
+            const name = prompt("Playlist name");
+            if (name) { await createPlaylist(name); setPlaylists(await getPlaylists()); }
+          }}
+          onAddFolder={handleAddFolder}
+          scanning={scanning}
+        />
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto" style={{ background: "#111111" }}>
-          <div className="sticky top-0 z-10 px-6 py-3 flex items-center gap-3" style={{ background: "rgba(17,17,17,0.9)", backdropFilter: "blur(8px)" }}>
-            <div className="flex items-center gap-2 flex-1 rounded-full px-4 py-2" style={{ background: "#1e1e1e", maxWidth: 380 }}>
-              <Search size={14} style={{ color: "#666" }} />
-              <input
-                value={searchQuery}
-                onChange={e => { setSearchQuery(e.target.value); if (e.target.value) setView("search"); }}
-                placeholder="Search for artists, songs or albums"
-                className="flex-1 bg-transparent outline-none"
-                style={{ fontSize: "12px", color: "#ccc" }}
-              />
-              {searchQuery && (
-                <button onClick={() => { setSearchQuery(""); setView("home"); }}>
-                  <X size={13} style={{ color: "#666" }} />
-                </button>
-              )}
-            </div>
-          </div>
+          <TopBar
+            searchQuery={searchQuery}
+            onSearchChange={(value) => { setSearchQuery(value); if (value) setView("search"); }}
+            onClear={() => { setSearchQuery(""); setView("home"); }}
+          />
 
           <div className="px-6 pb-6">
             {!ready ? (
@@ -412,127 +289,38 @@ export function MusicPlayer({ onClose }: MusicPlayerProps) {
           </div>
         </main>
 
-        {/* Right Panel: queue */}
-        <aside className="flex flex-col w-64 shrink-0 overflow-y-auto" style={{ background: "#161616" }}>
-          <div className="p-4 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-            <div className="flex items-center justify-between mb-3">
-              <h3 style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>Liked Songs</h3>
-              <MoreHorizontal size={14} style={{ color: "#666" }} />
-            </div>
-            <div className="grid grid-cols-2 gap-1.5 mb-2">
-              {favorites.slice(0, 4).map(song => (
-                <TrackArtwork key={song.id} trackId={song.id} className="w-full aspect-square object-cover rounded-lg" />
-              ))}
-            </div>
-            <div style={{ fontSize: "10px", color: "#666" }}>{favorites.length} liked songs</div>
-          </div>
-
-          <div className="flex-1 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>Up Next</h3>
-              <MoreHorizontal size={14} style={{ color: "#666" }} />
-            </div>
-            <div className="space-y-1">
-              {player.queue.length === 0 ? (
-                <div style={{ fontSize: "11px", color: "#555" }}>Queue is empty — play something to get started.</div>
-              ) : (
-                player.queue.map((song, i) => (
-                  <button
-                    key={`${song.id}-${i}`}
-                    onClick={() => player.setQueue(player.queue, i)}
-                    className="flex items-center gap-2.5 w-full px-2 py-2 rounded-lg transition-colors hover:bg-white/5 text-left"
-                    style={{ background: i === player.queueIndex ? "rgba(255,255,255,0.08)" : "transparent" }}
-                  >
-                    <div className="relative shrink-0">
-                      <TrackArtwork trackId={song.id} className="w-9 h-9 object-cover rounded-lg" />
-                      {i === player.queueIndex && player.isPlaying && (
-                        <div className="absolute inset-0 flex items-center justify-center rounded-lg" style={{ background: "rgba(0,0,0,0.5)" }}>
-                          <Pause size={10} color="#fff" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="truncate" style={{ fontSize: "11px", fontWeight: 500, color: i === player.queueIndex ? "#1db954" : "#ddd" }}>
-                        {song.title}
-                      </div>
-                      <div className="truncate" style={{ fontSize: "10px", color: "#666" }}>{song.artist}</div>
-                    </div>
-                    <button onClick={e => { e.stopPropagation(); handleToggleLike(song.id); }} className="shrink-0">
-                      <Heart size={12} style={{ color: liked.has(song.id) ? "#1db954" : "#555" }} fill={liked.has(song.id) ? "#1db954" : "none"} />
-                    </button>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        </aside>
+        <QueuePanel
+          favorites={favorites}
+          queue={player.queue}
+          queueIndex={player.queueIndex}
+          isPlaying={player.isPlaying}
+          liked={liked}
+          onSelectQueueIndex={(i) => player.setQueue(player.queue, i)}
+          onToggleLike={handleToggleLike}
+        />
       </div>
 
-      {/* Bottom Player Bar */}
-      <div className="shrink-0 flex items-center gap-4 px-6 py-3 border-t" style={{ background: "#0d0d0d", borderColor: "rgba(255,255,255,0.06)", minHeight: 72 }}>
-        <div className="flex items-center gap-3 w-48 shrink-0">
-          {player.current ? (
-            <>
-              <TrackArtwork trackId={player.current.id} className="w-12 h-12 object-cover rounded-lg" />
-              <div className="min-w-0">
-                <div className="truncate" style={{ fontSize: "12px", fontWeight: 500, color: "#fff" }}>{player.current.title}</div>
-                <div className="truncate" style={{ fontSize: "10px", color: "#888" }}>{player.current.artist}</div>
-              </div>
-              <button onClick={() => handleToggleLike(player.current!.id)} className="shrink-0">
-                <Heart size={14} style={{ color: liked.has(player.current.id) ? "#1db954" : "#555" }} fill={liked.has(player.current.id) ? "#1db954" : "none"} />
-              </button>
-            </>
-          ) : (
-            <div style={{ fontSize: "11px", color: "#555" }}>Nothing playing</div>
-          )}
-        </div>
-
-        <div className="flex-1 flex flex-col items-center gap-1.5">
-          <div className="flex items-center gap-5">
-            <button onClick={() => player.setShuffle(!player.shuffle)} className="transition-colors">
-              <Shuffle size={15} style={{ color: player.shuffle ? "#1db954" : "#666" }} />
-            </button>
-            <button onClick={player.prev} className="transition-colors hover:text-white" style={{ color: "#aaa" }}>
-              <SkipBack size={18} />
-            </button>
-            <button
-              onClick={player.toggle}
-              disabled={!player.current}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-transform hover:scale-105 disabled:opacity-40"
-              style={{ background: "#fff" }}
-            >
-              {player.buffering ? <Loader2 size={16} color="#000" className="animate-spin" /> : player.isPlaying ? <Pause size={16} color="#000" /> : <Play size={16} color="#000" />}
-            </button>
-            <button onClick={player.next} className="transition-colors hover:text-white" style={{ color: "#aaa" }}>
-              <SkipForward size={18} />
-            </button>
-            <button
-              onClick={() => player.setRepeat(player.repeat === "off" ? "all" : player.repeat === "all" ? "one" : "off")}
-              className="transition-colors"
-            >
-              <span style={{ color: player.repeat !== "off" ? "#1db954" : "#666" }}>{repeatIcon}</span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2 w-full max-w-md">
-            <span style={{ fontSize: "10px", color: "#666", minWidth: 32, textAlign: "right" }}>{formatTime(player.position)}</span>
-            <div className="flex-1 h-1 rounded-full cursor-pointer relative group" style={{ background: "rgba(255,255,255,0.12)" }} onClick={handleProgressClick}>
-              <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: `${progressPct}%`, background: "#fff" }} />
-              <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" style={{ left: `${progressPct}%`, transform: "translateX(-50%) translateY(-50%)", background: "#fff" }} />
-            </div>
-            <span style={{ fontSize: "10px", color: "#666", minWidth: 32 }}>{formatTime(player.duration)}</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 w-36 shrink-0 justify-end">
-          <button onClick={() => player.setMuted(!player.muted)} className="transition-colors" style={{ color: "#aaa" }}>
-            {player.muted || player.volume === 0 ? <VolumeX size={15} /> : <Volume2 size={15} />}
-          </button>
-          <div className="flex-1 h-1 rounded-full cursor-pointer relative group" style={{ background: "rgba(255,255,255,0.12)" }} onClick={handleVolumeClick}>
-            <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: `${volumePct}%`, background: "#fff" }} />
-          </div>
-        </div>
-      </div>
+      <TransportBar
+        current={player.current}
+        isPlaying={player.isPlaying}
+        buffering={player.buffering}
+        shuffle={player.shuffle}
+        repeat={player.repeat}
+        position={player.position}
+        duration={player.duration}
+        volume={player.volume}
+        muted={player.muted}
+        liked={liked}
+        onToggle={player.toggle}
+        onPrev={player.prev}
+        onNext={player.next}
+        onSetShuffle={player.setShuffle}
+        onCycleRepeat={() => player.setRepeat(player.repeat === "off" ? "all" : player.repeat === "all" ? "one" : "off")}
+        onSetMuted={player.setMuted}
+        onToggleLike={handleToggleLike}
+        onProgressClick={handleProgressClick}
+        onVolumeClick={handleVolumeClick}
+      />
     </div>
   );
 }
