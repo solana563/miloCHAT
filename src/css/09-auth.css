@@ -1,0 +1,29 @@
+/* auth */
+.au{flex:1;overflow-y:auto;display:flex;flex-direction:column;justify-content:center;padding:calc(var(--st) + 24px) 22px calc(var(--sb) + 24px)}
+.au h1{font-size:46px;letter-spacing:-.04em;margin:0 0 6px;font-weight:800}.au h1 i{color:var(--acc);font-style:normal}
+.au p{color:#a7aab5;margin:0 0 26px;line-height:1.45}
+.au .in{width:100%;display:block;margin-bottom:10px;background:var(--glass);border:1px solid rgba(255,255,255,.1);color:#fff}
+.au .in::placeholder{color:#8d909c}.au .pill{max-width:none;margin-top:8px}
+.au .sw{text-align:center;color:#a7aab5;margin-top:16px;font-size:14.5px}.au .sw button{color:#fff;font-weight:700;text-decoration:underline}
+.au .er{color:#ff8a78;font-size:14px;min-height:20px;margin:2px 4px 6px}
+.load{flex:1;display:grid;place-items:center;color:#8d909c}
+
+/* ---- search, hints, accessibility ---- */
+.fbar{display:flex;gap:8px;padding:0 14px 6px;align-items:center}.fbar .in{background:var(--glass);border-color:transparent;color:#fff;height:42px}
+.mm .vn{color:#c9a24a}
+:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:12px}
+.row:focus-visible{outline-color:var(--ink)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---- voice notes ---- */
+.vc{display:flex;align-items:center;gap:10px;min-width:190px}.vp{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.18);display:grid;place-items:center;flex:none}.vp svg{fill:currentColor;stroke:none;width:18px;height:18px}
+.m.th .vp{background:rgba(255,255,255,.14)}.vbar{flex:1;height:4px;border-radius:2px;background:rgba(128,128,128,.4);overflow:hidden}.vbar i{display:block;height:100%;width:0;background:currentColor;opacity:.8}.vc small{font-size:12px;opacity:.75;min-width:30px;text-align:right}
+.recdot{flex:none;width:10px;height:10px;border-radius:50%;background:#ff4d3d;animation:pulse 1s infinite}@keyframes pulse{50%{opacity:.3}}
+#mic.rec{background:#ff4d3d;color:#fff}
+
+/* ---- groups ---- */
+.sn{font-size:12px;font-weight:700;color:var(--acc);margin:6px 10px 2px}
+.gin{width:100%;display:block;background:var(--glass);border:0;color:#fff;margin-bottom:8px}.gin::placeholder{color:#8d909c}
+.gpick{max-height:38vh;overflow:auto}.gp{display:flex;gap:12px;align-items:center;padding:8px 10px;border-radius:16px;cursor:pointer}.gp:active{background:var(--glass)}.gp input{width:20px;height:20px;accent-color:var(--acc)}
+.gml{max-height:40vh;overflow:auto}.sh .it small{font-weight:500}
+.ch .btn.sm{height:32px;padding:0 13px}

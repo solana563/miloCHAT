@@ -1,0 +1,6 @@
+/* floating nav pill */
+.nav{flex:none;display:flex;justify-content:center;padding:10px 0 calc(var(--sb) + 10px)}
+.nav>div{display:flex;gap:4px;padding:6px;border-radius:34px;background:rgba(30,31,36,.92);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(18px)}
+.nav button{width:56px;height:46px;border-radius:26px;display:grid;place-items:center;color:#a7aab5;position:relative}
+.nav button.on{background:#fff;color:#000}
+.nav .dot{top:5px;right:9px}

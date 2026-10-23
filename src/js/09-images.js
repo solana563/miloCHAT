@@ -1,0 +1,3 @@
+/* ---- images ---- */
+function imgSmall(f,max,q,ar){return new Promise((res,rej)=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{try{let w=im.width,h=im.height,sx=0,sy=0,sw=w,sh=h;if(ar){if(w/h>ar){sw=Math.round(h*ar);sx=Math.round((w-sw)/2)}else{sh=Math.round(w/ar);sy=Math.round((h-sh)/2)}w=sw;h=sh}
+  const k=Math.min(1,max/Math.max(w,h)),c=document.createElement("canvas");c.width=Math.round(w*k);c.height=Math.round(h*k);c.getContext("2d").drawImage(im,sx,sy,sw,sh,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL("image/jpeg",q))}catch(e){rej(e)}};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error("bad image"))};im.src=u})}

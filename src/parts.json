@@ -1,0 +1,33 @@
+{
+ "parts": [
+  "head.html",
+  "css/00-base.css",
+  "css/01-header-on-black.css",
+  "css/02-avatars.css",
+  "css/03-big-light-cards.css",
+  "css/04-floating-nav-pill.css",
+  "css/05-segmented-control-friends.css",
+  "css/06-profile.css",
+  "css/07-chat-overlay.css",
+  "css/08-sheet-toast-pill.css",
+  "css/09-auth.css",
+  "mid.html",
+  "js/00-core.js",
+  "js/01-session.js",
+  "js/02-state.js",
+  "js/03-card-theme-light-dark-auto.js",
+  "js/04-song-art-tint-the-app-takes-the-co.js",
+  "js/05-data.js",
+  "js/06-views.js",
+  "js/07-chat.js",
+  "js/08-realtime-supabase-realtime-phoenix.js",
+  "js/09-images.js",
+  "js/09b-voice-notes.js",
+  "js/09c-groups.js",
+  "js/10-push.js",
+  "js/11-sheet.js",
+  "js/12-actions.js",
+  "js/13-service-worker-start.js",
+  "foot.html"
+ ]
+}

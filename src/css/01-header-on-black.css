@@ -1,0 +1,12 @@
+/* header on black */
+.top{display:flex;align-items:center;gap:12px;padding:calc(var(--st) + 14px) 18px 6px}
+.top .ttl{flex:1;font-size:26px;font-weight:800;letter-spacing:-.03em}.top .ttl i{color:var(--acc);font-style:normal}
+.ib{width:42px;height:42px;border-radius:50%;background:var(--glass);display:grid;place-items:center;position:relative;flex:none}
+.ib:active,.pill:active{transform:scale(.94)}
+.dot{position:absolute;top:8px;right:9px;min-width:16px;height:16px;padding:0 4px;border-radius:9px;background:var(--acc);color:var(--onacc);font-size:10px;font-weight:800;display:grid;place-items:center}
+.stories{display:flex;gap:12px;padding:12px 18px 14px;overflow-x:auto;scrollbar-width:none;flex:none}.stories::-webkit-scrollbar{display:none}
+.st{display:flex;flex-direction:column;align-items:center;gap:5px;width:62px;flex:none;font-size:11px;color:#b9bcc6}
+.st .ring{width:62px;height:62px;border-radius:50%;padding:3px;display:grid;place-items:center;border:2px solid transparent;position:relative}
+.st .ring.on{border-color:var(--acc)}.st .ring.add{border:2px dashed #5b5e69;color:#d6d8df}
+.st .ub{position:absolute;right:-1px;top:-1px;min-width:18px;height:18px;border-radius:9px;background:var(--acc);color:var(--onacc);font-size:10px;font-weight:800;display:grid;place-items:center;border:2px solid #000}
+.st span{max-width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

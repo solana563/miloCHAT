@@ -1,0 +1,12 @@
+/* segmented control (friends) */
+.seg{display:flex;gap:4px;padding:5px;margin:8px 18px 14px;border-radius:30px;background:var(--glass);flex:none}
+.seg button{flex:1;height:42px;border-radius:25px;display:flex;align-items:center;justify-content:center;gap:7px;font-weight:700;font-size:14px;color:#b9bcc6}
+.seg button.on{background:#fff;color:#000}.seg .bd{background:var(--acc);color:var(--onacc);height:18px;min-width:18px;font-size:11px}
+.pg{flex:1;min-height:0;display:flex;flex-direction:column}
+.big-t{font-size:30px;font-weight:800;letter-spacing:-.03em;padding:calc(var(--st) + 18px) 22px 4px}
+.field{display:flex;gap:8px;padding:6px 14px 10px}
+.in{flex:1;min-width:0;height:48px;border-radius:24px;background:var(--card2);border:1px solid var(--line);padding:0 18px;color:var(--ink);outline:0}
+.in::placeholder{color:#9a9eab}
+.btn{height:48px;padding:0 22px;border-radius:24px;background:var(--ink);color:var(--onink);font-weight:700;flex:none}
+.btn.acc{background:var(--acc);color:var(--onacc)}.btn.sm{height:36px;padding:0 15px;font-size:13.5px;border-radius:18px}.btn.gh{background:rgba(128,128,128,.18);color:var(--ink)}
+.note{color:#c4432e;font-size:13.5px;padding:2px 22px 6px}.hint{color:var(--mut);font-size:13px;padding:2px 22px 8px}
